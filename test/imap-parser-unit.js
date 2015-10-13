@@ -10,7 +10,7 @@
     'use strict';
 
     var expect = chai.expect;
-    chai.Assertion.includeStack = true;
+    chai.config.includeStack = true;
 
     describe('IMAP Command Parser', function() {
         describe('get tag', function() {

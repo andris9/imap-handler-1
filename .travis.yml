@@ -1,9 +1,12 @@
 language: node_js
+sudo: false
 node_js:
   - "0.10"
-  - "0.11"
+  - 0.12
+  - iojs
+  - stable
 before_install:
   - npm install -g grunt-cli
 notifications:
   email:
-  - build@whiteout.io
+  - andris@kreata.ee

@@ -2,7 +2,7 @@
 
 UMD module that parses and compiles IMAP commands.
 
-[![Build Status](https://travis-ci.org/whiteout-io/imap-handler.png?branch=master)](https://travis-ci.org/whiteout-io/imap-handler)
+[![Build Status](https://travis-ci.org/andris9/imap-handler-1.png?branch=master)](https://travis-ci.org/andris9/imap-handler-1)
 
 ## Install
 
