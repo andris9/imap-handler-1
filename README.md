@@ -1,6 +1,6 @@
 # IMAP Handler
 
-UMD module that parses and compiles IMAP commands.
+Server specific fork of [emailjs-imap-handler](https://github.com/emailjs/emailjs-imap-handler) for Node.js (v5+). Mostly differs from the upstream in the behavior for compiling – instead of compiling a command into long string, a Stream object is returned that can be piped directly to socket. Goal is to pass around large messages as streams instead of keeping these in memory.
 
 [![Build Status](https://travis-ci.org/andris9/imap-handler-1.png?branch=master)](https://travis-ci.org/andris9/imap-handler-1)
 
@@ -8,7 +8,7 @@ UMD module that parses and compiles IMAP commands.
 
 ### [npm](https://www.npmjs.org/):
 
-    npm install wo-imap-handler
+    npm install imap-handler-1
 
 ## Usage
 
@@ -52,7 +52,7 @@ If section or partial values are not specified in the command, the values are al
 For example
 
 ```javascript
-var imapHandler = require("imap-handler");
+let imapHandler = require("imap-handler-1");
 
 imapHandler.parser("A1 FETCH *:4 (BODY[HEADER.FIELDS ({4}\r\nDate Subject)]<12.45> UID)");
 ```
@@ -104,17 +104,16 @@ Results in the following value:
 
 ### Compile command objects into IMAP commands
 
-You can "compile" parsed or self generated IMAP command obejcts to IMAP command strings with
+You can "compile" parsed or self generated IMAP command objects to IMAP command strings with
 
-    imapHandler.compiler(commandObject, asArray);
+    imapHandler.compiler(commandObject, isLogging);
 
 Where
 
   * **commandObject** is an object parsed with `imapHandler.parser()` or self generated
-  * **asArray** if set to `true` return the value as an array instead of a string where the command is split on LITERAL notions
   * **isLogging** if set to true, do not include literals and long strings, useful when logging stuff and do not want to include message bodies etc. Additionally nodes with `sensitive: true` options are also not displayed (useful with logging passwords) if `logging` is used.
 
-The function returns a string or if `asArray` is set to true, as an array which is split on LITERAL notions, eg. "{4}\r\nabcde" becomes ["{4}\r\n", "abcde"]. This is useful if you need to wait for "+" response from the server before you can transmit the literal data.
+The function returns a Stream.
 
 The input object differs from the parsed object with the following aspects:
 
@@ -124,7 +123,7 @@ The input object differs from the parsed object with the following aspects:
 For example
 
 ```javascript
-var command = {
+let command = {
     tag: "*",
     command: "OK",
     attributes: [
@@ -138,14 +137,14 @@ var command = {
     ]
 };
 
-imapHandler.compiler(command);
+imapHandler.compiler(command).pipe(process.stdout);
 // * OK [ALERT] NB! The server is shutting down
 ```
 
 ## License
 
 ```
-Copyright (c) 2013 Andris Reinman
+Copyright (c) 2013-2016 Andris Reinman
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
