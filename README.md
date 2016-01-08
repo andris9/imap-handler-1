@@ -108,7 +108,7 @@ Results in the following value:
 
 You can "compile" parsed or self generated IMAP command objects to IMAP command strings with
 
-    imapHandler.compiler(commandObject, isLogging);
+    imapHandler.compileStream(commandObject, isLogging);
 
 Where
 
@@ -140,7 +140,7 @@ let command = {
     ]
 };
 
-imapHandler.compiler(command).pipe(process.stdout);
+imapHandler.compileStream(command).pipe(process.stdout);
 // * OK [ALERT] NB! The server is shutting down
 ```
 
