@@ -341,6 +341,34 @@ describe('IMAP Command Compile Stream', function () {
                     }, 100);
                 }, 100);
             });
+
+            it('shoud pipe errors for literal streams', function (done) {
+                let stream1 = new PassThrough();
+                let parsed = {
+                    tag: '*',
+                    command: 'CMD',
+                    attributes: [
+                        // keep indentation
+                        {
+                            type: 'LITERAL',
+                            value: 'Tere tere!'
+                        }, {
+                            type: 'LITERAL',
+                            expectedLength: 5,
+                            value: stream1
+                        }
+                    ]
+                };
+
+                resolveStream(imapHandler.compileStream(parsed, false), err => {
+                    expect(err).to.exist;
+                    done();
+                });
+
+                setTimeout(() => {
+                    stream1.emit('error', new Error('Stream error'));
+                }, 100);
+            });
         });
     });
 
