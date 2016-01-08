@@ -123,6 +123,16 @@ The input object differs from the parsed object with the following aspects:
   * Additional types are used: `SECTION` which is an alias for `ATOM` and `TEXT` which returns the input string as given with no modification (useful for server messages).
   * **LITERAL** can takes streams as values. You do need to know the expected length beforehand though `{type:'LITERAL', expectedLength: 1024, value: stream}`. If the provided length does not match actual stream output length, then the output is either truncated or padded with space symbols to match the expected length.
 
+```javascript
+{
+    type: 'LITERAL',
+    value: stream,
+    expectedLength: 100, // full stream length
+    startFrom: 10, // optional start marker, do not emit bytes before it
+    maxLength: 30 // optional length of the output stream
+}
+```
+
 For example
 
 ```javascript

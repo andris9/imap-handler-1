@@ -342,6 +342,61 @@ describe('IMAP Command Compile Stream', function () {
                 }, 100);
             });
 
+            it('shoud pipe limited literal streams', function (done) {
+                let stream1 = new PassThrough();
+                let stream2 = new PassThrough();
+                let stream3 = new PassThrough();
+                let parsed = {
+                    tag: '*',
+                    command: 'CMD',
+                    attributes: [
+                        // keep indentation
+                        {
+                            type: 'LITERAL',
+                            value: 'Tere tere!'
+                        }, {
+                            type: 'LITERAL',
+                            expectedLength: 5,
+                            value: stream1,
+                            startFrom: 2,
+                            maxLength: 2
+                        },
+                        'Vana kere', {
+                            type: 'LITERAL',
+                            expectedLength: 7,
+                            value: stream2,
+                            startFrom: 2
+                        }, {
+                            type: 'LITERAL',
+                            value: 'Kuidas laheb?'
+                        }, {
+                            type: 'LITERAL',
+                            expectedLength: 7,
+                            value: stream3,
+                            startFrom: 2,
+                            maxLength: 2
+                        }
+                    ]
+                };
+
+                let command = '* CMD {10}\r\nTere tere! {2}\r\nst "Vana kere" {5}\r\nst2   {13}\r\nKuidas laheb? {2}\r\nst';
+                resolveStream(imapHandler.compileStream(parsed, false), (err, compiled) => {
+                    expect(err).to.not.exist;
+                    expect(compiled.toString('binary')).to.equal(command);
+                    done();
+                });
+
+                setTimeout(() => {
+                    stream2.end('test2');
+                    setTimeout(() => {
+                        stream1.end('test1');
+                        setTimeout(() => {
+                            stream3.end('test3');
+                        }, 100);
+                    }, 100);
+                }, 100);
+            });
+
             it('shoud pipe errors for literal streams', function (done) {
                 let stream1 = new PassThrough();
                 let parsed = {
@@ -406,6 +461,33 @@ describe('IMAP Command Compile Stream', function () {
             let len = 1024;
             let limiter = new imapHandler.compileStream.LengthLimiter(len - 100);
             let expected = 'X'.repeat(len - 100);
+
+            resolveStream(limiter, (err, value) => {
+                value = value.toString();
+                expect(err).to.not.exist;
+                expect(value).to.equal(expected);
+                done();
+            });
+
+            let emitted = 0;
+            let emitter = () => {
+                let str = 'X'.repeat(128);
+                emitted += str.length;
+                limiter.write(new Buffer(str));
+                if (emitted >= len) {
+                    limiter.end();
+                } else {
+                    setTimeout(emitter, 100);
+                }
+            };
+
+            setTimeout(emitter, 100);
+        });
+
+        it('should skip output', function (done) {
+            let len = 1024;
+            let limiter = new imapHandler.compileStream.LengthLimiter(len - 100, false, 30);
+            let expected = 'X'.repeat(len - 100 - 30);
 
             resolveStream(limiter, (err, value) => {
                 value = value.toString();
