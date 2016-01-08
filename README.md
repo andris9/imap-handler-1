@@ -2,6 +2,8 @@
 
 Server specific fork of [emailjs-imap-handler](https://github.com/emailjs/emailjs-imap-handler) for Node.js (v5+). Mostly differs from the upstream in the behavior for compiling – instead of compiling a command into long string, a Stream object is returned that can be piped directly to socket. Goal is to pass around large messages as streams instead of keeping these in memory.
 
+This is more suitable for servers than clients as it is currently not possible to pause the output stream to wait for '+' tagged server response for literal values.
+
 [![Build Status](https://travis-ci.org/andris9/imap-handler-1.png?branch=master)](https://travis-ci.org/andris9/imap-handler-1)
 
 ## Install
@@ -119,6 +121,7 @@ The input object differs from the parsed object with the following aspects:
 
   * **string**, **number** and **null** (null values are all non-number and non-string falsy values) are allowed to use directly - `{type: "STRING", value: "hello"}` can be replaced with `"hello"`
   * Additional types are used: `SECTION` which is an alias for `ATOM` and `TEXT` which returns the input string as given with no modification (useful for server messages).
+  * **LITERAL** can takes streams as values. You do need to know the expected length beforehand though `{type:'LITERAL', expectedLength: 1024, value: stream}`. If the provided length does not match actual stream output length, then the output is either truncated or padded with space symbols to match the expected length.
 
 For example
 

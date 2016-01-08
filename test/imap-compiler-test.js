@@ -4,7 +4,7 @@
 
 let chai = require('chai');
 let imapHandler = require('../lib/imap-handler');
-
+let PassThrough = require('stream').PassThrough;
 let expect = chai.expect;
 chai.config.includeStack = true;
 
@@ -291,6 +291,141 @@ describe('IMAP Command Compiler', function () {
                     done();
                 });
             });
+
+            it('shoud pipe literal streams', function (done) {
+                let stream1 = new PassThrough();
+                let stream2 = new PassThrough();
+                let stream3 = new PassThrough();
+                let parsed = {
+                    tag: '*',
+                    command: 'CMD',
+                    attributes: [
+                        // keep indentation
+                        {
+                            type: 'LITERAL',
+                            value: 'Tere tere!'
+                        }, {
+                            type: 'LITERAL',
+                            expectedLength: 5,
+                            value: stream1
+                        },
+                        'Vana kere', {
+                            type: 'LITERAL',
+                            expectedLength: 7,
+                            value: stream2
+                        }, {
+                            type: 'LITERAL',
+                            value: 'Kuidas laheb?'
+                        }, {
+                            type: 'LITERAL',
+                            expectedLength: 5,
+                            value: stream3
+                        }
+                    ]
+                };
+
+                let command = '* CMD {10}\r\nTere tere! {5}\r\ntest1 "Vana kere" {7}\r\ntest2   {13}\r\nKuidas laheb? {5}\r\ntest3';
+                resolveStream(imapHandler.compiler(parsed, false), (err, compiled) => {
+                    expect(err).to.not.exist;
+                    expect(compiled.toString('binary')).to.equal(command);
+                    done();
+                });
+
+                setTimeout(() => {
+                    stream2.end('test2');
+                    setTimeout(() => {
+                        stream1.end('test1');
+                        setTimeout(() => {
+                            stream3.end('test3');
+                        }, 100);
+                    }, 100);
+                }, 100);
+            });
+        });
+    });
+
+    describe('#LengthLimiter', function () {
+        this.timeout(10000); //eslint-disable-line no-invalid-this
+
+        it('should emit exact length', function (done) {
+            let len = 1024;
+            let limiter = new imapHandler.compiler.LengthLimiter(len);
+            let expected = 'X'.repeat(len);
+
+            resolveStream(limiter, (err, value) => {
+                value = value.toString();
+                expect(err).to.not.exist;
+                expect(value).to.equal(expected);
+                done();
+            });
+
+            let emitted = 0;
+            let emitter = () => {
+                let str = 'X'.repeat(128);
+                emitted += str.length;
+                limiter.write(new Buffer(str));
+                if (emitted >= len) {
+                    limiter.end();
+                } else {
+                    setTimeout(emitter, 100);
+                }
+            };
+
+            setTimeout(emitter, 100);
+        });
+
+        it('should truncate output', function (done) {
+            let len = 1024;
+            let limiter = new imapHandler.compiler.LengthLimiter(len - 100);
+            let expected = 'X'.repeat(len - 100);
+
+            resolveStream(limiter, (err, value) => {
+                value = value.toString();
+                expect(err).to.not.exist;
+                expect(value).to.equal(expected);
+                done();
+            });
+
+            let emitted = 0;
+            let emitter = () => {
+                let str = 'X'.repeat(128);
+                emitted += str.length;
+                limiter.write(new Buffer(str));
+                if (emitted >= len) {
+                    limiter.end();
+                } else {
+                    setTimeout(emitter, 100);
+                }
+            };
+
+            setTimeout(emitter, 100);
+        });
+
+        it('should pad output', function (done) {
+            let len = 1024;
+            let limiter = new imapHandler.compiler.LengthLimiter(len + 100);
+            let expected = 'X'.repeat(len) + ' '.repeat(100);
+
+            resolveStream(limiter, (err, value) => {
+                value = value.toString();
+                expect(err).to.not.exist;
+                expect(value).to.equal(expected);
+                done();
+            });
+
+            let emitted = 0;
+            let emitter = () => {
+                let str = 'X'.repeat(128);
+                emitted += str.length;
+                limiter.write(new Buffer(str));
+                if (emitted >= len) {
+                    limiter.end();
+                } else {
+                    setTimeout(emitter, 100);
+                }
+            };
+
+            setTimeout(emitter, 100);
         });
     });
 });

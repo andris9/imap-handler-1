@@ -1,7 +1,7 @@
 {
   "name": "imap-handler-1",
   "main": "lib/imap-handler.js",
-  "version": "0.1.15",
+  "version": "1.0.0",
   "homepage": "https://github.com/andris9/imap-handler-1",
   "author": "Andris Reinman <andris@kreata.ee>",
   "description": "Parse and compile IMAP commands",
