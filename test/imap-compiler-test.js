@@ -1,16 +1,17 @@
-/*eslint no-unused-expressions: 0, prefer-arrow-callback: 0 */
+/* eslint no-unused-expressions:0 */
+/* globals beforeEach, describe, it */
 
 'use strict';
 
-let chai = require('chai');
-let imapHandler = require('../lib/imap-handler');
-let expect = chai.expect;
+var chai = require('chai');
+var imapHandler = require('../lib/imap-handler');
+var expect = chai.expect;
 chai.config.includeStack = true;
 
 describe('IMAP Command Compiler', function () {
     describe('#compile', function () {
         it('should compile correctly', function () {
-            let command = '* FETCH (ENVELOPE ("Mon, 2 Sep 2013 05:30:13 -0700 (PDT)" NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "tr.ee")) NIL NIL NIL "<-4730417346358914070@unknownmsgid>") BODYSTRUCTURE (("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 105 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "<test1>" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 5 NIL NIL NIL) ("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 83 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "NIL" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 4 NIL NIL NIL) ("TEXT" "HTML" ("CHARSET" "utf-8") NIL NIL "QUOTED-PRINTABLE" 19 0 NIL NIL NIL) "MIXED" ("BOUNDARY" "----mailcomposer-?=_1-1328088797399") NIL NIL))',
+            var command = '* FETCH (ENVELOPE ("Mon, 2 Sep 2013 05:30:13 -0700 (PDT)" NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "tr.ee")) NIL NIL NIL "<-4730417346358914070@unknownmsgid>") BODYSTRUCTURE (("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 105 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "<test1>" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 5 NIL NIL NIL) ("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 83 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "NIL" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 4 NIL NIL NIL) ("TEXT" "HTML" ("CHARSET" "utf-8") NIL NIL "QUOTED-PRINTABLE" 19 0 NIL NIL NIL) "MIXED" ("BOUNDARY" "----mailcomposer-?=_1-1328088797399") NIL NIL))',
                 parsed = imapHandler.parser(command, {
                     allowUntagged: true
                 }),
@@ -21,7 +22,7 @@ describe('IMAP Command Compiler', function () {
     });
 
     describe('Types', function () {
-        let parsed;
+        var parsed;
 
         beforeEach(function () {
             parsed = {
@@ -171,7 +172,7 @@ describe('IMAP Command Compiler', function () {
         });
         describe('Literal', function () {
             it('shoud return as text', function () {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -188,7 +189,7 @@ describe('IMAP Command Compiler', function () {
             });
 
             it('should return as an array text 1', function () {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [{
@@ -203,7 +204,7 @@ describe('IMAP Command Compiler', function () {
             });
 
             it('should return as an array text 2', function () {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -222,7 +223,7 @@ describe('IMAP Command Compiler', function () {
             });
 
             it('should compile correctly without tag and command', function () {
-                let parsed = {
+                var parsed = {
                     attributes: [{
                         type: 'LITERAL',
                         value: 'Tere tere!'
@@ -235,7 +236,7 @@ describe('IMAP Command Compiler', function () {
             });
 
             it('shoud return byte length', function () {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [

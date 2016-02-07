@@ -1,12 +1,13 @@
-/*eslint no-unused-expressions: 0, prefer-arrow-callback: 0 */
+/* eslint no-unused-expressions:0 */
+/* globals describe, it */
 
 'use strict';
 
-let chai = require('chai');
-let imapHandler = require('../lib/imap-handler');
-let mimetorture = require('./fixtures/mimetorture');
+var chai = require('chai');
+var imapHandler = require('../lib/imap-handler');
+var mimetorture = require('./fixtures/mimetorture');
 
-let expect = chai.expect;
+var expect = chai.expect;
 chai.config.includeStack = true;
 
 describe('IMAP Command Parser', function () {
@@ -762,7 +763,7 @@ describe('IMAP Command Parser', function () {
 
     describe('MimeTorture', function () {
         it('should parse mimetorture input', function () {
-            let parsed;
+            var parsed;
             expect(function () {
                 parsed = imapHandler.parser(mimetorture.input);
             }).to.not.throw(Error);

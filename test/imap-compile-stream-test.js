@@ -1,11 +1,12 @@
-/*eslint no-unused-expressions: 0, prefer-arrow-callback: 0 */
+/* eslint no-unused-expressions:0 */
+/* globals beforeEach, describe, it */
 
 'use strict';
 
-let chai = require('chai');
-let imapHandler = require('../lib/imap-handler');
-let PassThrough = require('stream').PassThrough;
-let expect = chai.expect;
+var chai = require('chai');
+var imapHandler = require('../lib/imap-handler');
+var PassThrough = require('stream').PassThrough;
+var expect = chai.expect;
 chai.config.includeStack = true;
 
 describe('IMAP Command Compile Stream', function () {
@@ -13,12 +14,12 @@ describe('IMAP Command Compile Stream', function () {
     describe('#compile', function () {
 
         it('should compile correctly', function (done) {
-            let command = '* FETCH (ENVELOPE ("Mon, 2 Sep 2013 05:30:13 -0700 (PDT)" NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "tr.ee")) NIL NIL NIL "<-4730417346358914070@unknownmsgid>") BODYSTRUCTURE (("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 105 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "<test1>" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 5 NIL NIL NIL) ("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 83 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "NIL" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 4 NIL NIL NIL) ("TEXT" "HTML" ("CHARSET" "utf-8") NIL NIL "QUOTED-PRINTABLE" 19 0 NIL NIL NIL) "MIXED" ("BOUNDARY" "----mailcomposer-?=_1-1328088797399") NIL NIL))',
+            var command = '* FETCH (ENVELOPE ("Mon, 2 Sep 2013 05:30:13 -0700 (PDT)" NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "tr.ee")) NIL NIL NIL "<-4730417346358914070@unknownmsgid>") BODYSTRUCTURE (("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 105 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "<test1>" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 5 NIL NIL NIL) ("MESSAGE" "RFC822" NIL NIL NIL "7BIT" 83 (NIL NIL ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "kreata.ee")) ((NIL NIL "andris" "pangalink.net")) NIL NIL "NIL" NIL) ("TEXT" "PLAIN" NIL NIL NIL "7BIT" 12 0 NIL NIL NIL) 4 NIL NIL NIL) ("TEXT" "HTML" ("CHARSET" "utf-8") NIL NIL "QUOTED-PRINTABLE" 19 0 NIL NIL NIL) "MIXED" ("BOUNDARY" "----mailcomposer-?=_1-1328088797399") NIL NIL))',
                 parsed = imapHandler.parser(command, {
                     allowUntagged: true
                 });
 
-            resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+            resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                 expect(err).to.not.exist;
                 expect(compiled.toString('binary')).to.equal(command);
                 done();
@@ -27,7 +28,7 @@ describe('IMAP Command Compile Stream', function () {
     });
 
     describe('Types', function () {
-        let parsed;
+        var parsed;
 
         beforeEach(function () {
             parsed = {
@@ -38,9 +39,9 @@ describe('IMAP Command Compile Stream', function () {
 
         describe('No attributes', function () {
             it('should compile correctly', function (done) {
-                let command = '* CMD';
+                var command = '* CMD';
 
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -54,8 +55,8 @@ describe('IMAP Command Compile Stream', function () {
                     type: 'TEXT',
                     value: 'Tere tere!'
                 }];
-                let command = '* CMD Tere tere!';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD Tere tere!';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -72,8 +73,8 @@ describe('IMAP Command Compile Stream', function () {
                         value: 'ALERT'
                     }]
                 }];
-                let command = '* CMD [ALERT]';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD [ALERT]';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -93,8 +94,8 @@ describe('IMAP Command Compile Stream', function () {
                     type: 'ATOM',
                     value: 'NO ALERT'
                 }];
-                let command = '* CMD ALERT \\ALERT "NO ALERT"';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD ALERT \\ALERT "NO ALERT"';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -108,8 +109,8 @@ describe('IMAP Command Compile Stream', function () {
                     type: 'SEQUENCE',
                     value: '*:4,5,6'
                 }];
-                let command = '* CMD *:4,5,6';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD *:4,5,6';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -124,8 +125,8 @@ describe('IMAP Command Compile Stream', function () {
                     null
                 ];
 
-                let command = '* CMD NIL NIL';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD NIL NIL';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -145,8 +146,8 @@ describe('IMAP Command Compile Stream', function () {
                     'Vana kere'
                 ];
 
-                let command = '* CMD "Tere tere!" "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD "Tere tere!" "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -163,8 +164,8 @@ describe('IMAP Command Compile Stream', function () {
                     'Vana kere'
                 ];
 
-                let command = '* CMD "Tere tere!" "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed, true), (err, compiled) => {
+                var command = '* CMD "Tere tere!" "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed, true), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -182,8 +183,8 @@ describe('IMAP Command Compile Stream', function () {
                     'Vana kere'
                 ];
 
-                let command = '* CMD "(* value hidden *)" "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed, true), (err, compiled) => {
+                var command = '* CMD "(* value hidden *)" "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed, true), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -200,8 +201,8 @@ describe('IMAP Command Compile Stream', function () {
                     'Vana kere'
                 ];
 
-                let command = '* CMD "(* 54B string *)" "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed, true), (err, compiled) => {
+                var command = '* CMD "(* 54B string *)" "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed, true), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -221,8 +222,8 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                let command = '* 1 EXPUNGE';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* 1 EXPUNGE';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -231,7 +232,7 @@ describe('IMAP Command Compile Stream', function () {
         });
         describe('Literal', function () {
             it('shoud return as text', function (done) {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -244,8 +245,8 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                let command = '* CMD {10}\r\nTere tere! "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '* CMD {10}\r\nTere tere! "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -253,7 +254,7 @@ describe('IMAP Command Compile Stream', function () {
             });
 
             it('should compile correctly without tag and command', function (done) {
-                let parsed = {
+                var parsed = {
                     attributes: [{
                         type: 'LITERAL',
                         value: 'Tere tere!'
@@ -262,8 +263,8 @@ describe('IMAP Command Compile Stream', function () {
                         value: 'Vana kere'
                     }]
                 };
-                let command = '{10}\r\nTere tere! {9}\r\nVana kere';
-                resolveStream(imapHandler.compileStream(parsed), (err, compiled) => {
+                var command = '{10}\r\nTere tere! {9}\r\nVana kere';
+                resolveStream(imapHandler.compileStream(parsed), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -271,7 +272,7 @@ describe('IMAP Command Compile Stream', function () {
             });
 
             it('shoud return byte length', function (done) {
-                let parsed = {
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -284,8 +285,8 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                let command = '* CMD "(* 10B literal *)" "Vana kere"';
-                resolveStream(imapHandler.compileStream(parsed, true), (err, compiled) => {
+                var command = '* CMD "(* 10B literal *)" "Vana kere"';
+                resolveStream(imapHandler.compileStream(parsed, true), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
@@ -293,10 +294,10 @@ describe('IMAP Command Compile Stream', function () {
             });
 
             it('shoud pipe literal streams', function (done) {
-                let stream1 = new PassThrough();
-                let stream2 = new PassThrough();
-                let stream3 = new PassThrough();
-                let parsed = {
+                var stream1 = new PassThrough();
+                var stream2 = new PassThrough();
+                var stream3 = new PassThrough();
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -324,18 +325,18 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                let command = '* CMD {10}\r\nTere tere! {5}\r\ntest1 "Vana kere" {7}\r\ntest2   {13}\r\nKuidas laheb? {5}\r\ntest3';
-                resolveStream(imapHandler.compileStream(parsed, false), (err, compiled) => {
+                var command = '* CMD {10}\r\nTere tere! {5}\r\ntest1 "Vana kere" {7}\r\ntest2   {13}\r\nKuidas laheb? {5}\r\ntest3';
+                resolveStream(imapHandler.compileStream(parsed, false), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
                 });
 
-                setTimeout(() => {
+                setTimeout(function () {
                     stream2.end('test2');
-                    setTimeout(() => {
+                    setTimeout(function () {
                         stream1.end('test1');
-                        setTimeout(() => {
+                        setTimeout(function () {
                             stream3.end('test3');
                         }, 100);
                     }, 100);
@@ -343,10 +344,10 @@ describe('IMAP Command Compile Stream', function () {
             });
 
             it('shoud pipe limited literal streams', function (done) {
-                let stream1 = new PassThrough();
-                let stream2 = new PassThrough();
-                let stream3 = new PassThrough();
-                let parsed = {
+                var stream1 = new PassThrough();
+                var stream2 = new PassThrough();
+                var stream3 = new PassThrough();
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -379,18 +380,18 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                let command = '* CMD {10}\r\nTere tere! {2}\r\nst "Vana kere" {5}\r\nst2   {13}\r\nKuidas laheb? {2}\r\nst';
-                resolveStream(imapHandler.compileStream(parsed, false), (err, compiled) => {
+                var command = '* CMD {10}\r\nTere tere! {2}\r\nst "Vana kere" {5}\r\nst2   {13}\r\nKuidas laheb? {2}\r\nst';
+                resolveStream(imapHandler.compileStream(parsed, false), function (err, compiled) {
                     expect(err).to.not.exist;
                     expect(compiled.toString('binary')).to.equal(command);
                     done();
                 });
 
-                setTimeout(() => {
+                setTimeout(function () {
                     stream2.end('test2');
-                    setTimeout(() => {
+                    setTimeout(function () {
                         stream1.end('test1');
-                        setTimeout(() => {
+                        setTimeout(function () {
                             stream3.end('test3');
                         }, 100);
                     }, 100);
@@ -398,8 +399,8 @@ describe('IMAP Command Compile Stream', function () {
             });
 
             it('shoud pipe errors for literal streams', function (done) {
-                let stream1 = new PassThrough();
-                let parsed = {
+                var stream1 = new PassThrough();
+                var parsed = {
                     tag: '*',
                     command: 'CMD',
                     attributes: [
@@ -415,12 +416,12 @@ describe('IMAP Command Compile Stream', function () {
                     ]
                 };
 
-                resolveStream(imapHandler.compileStream(parsed, false), err => {
+                resolveStream(imapHandler.compileStream(parsed, false), function (err) {
                     expect(err).to.exist;
                     done();
                 });
 
-                setTimeout(() => {
+                setTimeout(function () {
                     stream1.emit('error', new Error('Stream error'));
                 }, 100);
             });
@@ -431,20 +432,20 @@ describe('IMAP Command Compile Stream', function () {
         this.timeout(10000); //eslint-disable-line no-invalid-this
 
         it('should emit exact length', function (done) {
-            let len = 1024;
-            let limiter = new imapHandler.compileStream.LengthLimiter(len);
-            let expected = 'X'.repeat(len);
+            var len = 1024;
+            var limiter = new imapHandler.compileStream.LengthLimiter(len);
+            var expected = repeat('X', len);
 
-            resolveStream(limiter, (err, value) => {
+            resolveStream(limiter, function (err, value) {
                 value = value.toString();
                 expect(err).to.not.exist;
                 expect(value).to.equal(expected);
                 done();
             });
 
-            let emitted = 0;
-            let emitter = () => {
-                let str = 'X'.repeat(128);
+            var emitted = 0;
+            var emitter = function () {
+                var str = repeat('X', 128);
                 emitted += str.length;
                 limiter.write(new Buffer(str));
                 if (emitted >= len) {
@@ -458,20 +459,20 @@ describe('IMAP Command Compile Stream', function () {
         });
 
         it('should truncate output', function (done) {
-            let len = 1024;
-            let limiter = new imapHandler.compileStream.LengthLimiter(len - 100);
-            let expected = 'X'.repeat(len - 100);
+            var len = 1024;
+            var limiter = new imapHandler.compileStream.LengthLimiter(len - 100);
+            var expected = repeat('X', len - 100);
 
-            resolveStream(limiter, (err, value) => {
+            resolveStream(limiter, function (err, value) {
                 value = value.toString();
                 expect(err).to.not.exist;
                 expect(value).to.equal(expected);
                 done();
             });
 
-            let emitted = 0;
-            let emitter = () => {
-                let str = 'X'.repeat(128);
+            var emitted = 0;
+            var emitter = function () {
+                var str = repeat('X', 128);
                 emitted += str.length;
                 limiter.write(new Buffer(str));
                 if (emitted >= len) {
@@ -485,20 +486,20 @@ describe('IMAP Command Compile Stream', function () {
         });
 
         it('should skip output', function (done) {
-            let len = 1024;
-            let limiter = new imapHandler.compileStream.LengthLimiter(len - 100, false, 30);
-            let expected = 'X'.repeat(len - 100 - 30);
+            var len = 1024;
+            var limiter = new imapHandler.compileStream.LengthLimiter(len - 100, false, 30);
+            var expected = repeat('X', len - 100 - 30);
 
-            resolveStream(limiter, (err, value) => {
+            resolveStream(limiter, function (err, value) {
                 value = value.toString();
                 expect(err).to.not.exist;
                 expect(value).to.equal(expected);
                 done();
             });
 
-            let emitted = 0;
-            let emitter = () => {
-                let str = 'X'.repeat(128);
+            var emitted = 0;
+            var emitter = function () {
+                var str = repeat('X', 128);
                 emitted += str.length;
                 limiter.write(new Buffer(str));
                 if (emitted >= len) {
@@ -512,20 +513,20 @@ describe('IMAP Command Compile Stream', function () {
         });
 
         it('should pad output', function (done) {
-            let len = 1024;
-            let limiter = new imapHandler.compileStream.LengthLimiter(len + 100);
-            let expected = 'X'.repeat(len) + ' '.repeat(100);
+            var len = 1024;
+            var limiter = new imapHandler.compileStream.LengthLimiter(len + 100);
+            var expected = repeat('X', len) + repeat(' ', 100);
 
-            resolveStream(limiter, (err, value) => {
+            resolveStream(limiter, function (err, value) {
                 value = value.toString();
                 expect(err).to.not.exist;
                 expect(value).to.equal(expected);
                 done();
             });
 
-            let emitted = 0;
-            let emitter = () => {
-                let str = 'X'.repeat(128);
+            var emitted = 0;
+            var emitter = function () {
+                var str = repeat('X', 128);
                 emitted += str.length;
                 limiter.write(new Buffer(str));
                 if (emitted >= len) {
@@ -541,11 +542,11 @@ describe('IMAP Command Compile Stream', function () {
 });
 
 function resolveStream(stream, callback) {
-    let chunks = [];
-    let chunklen = 0;
+    var chunks = [];
+    var chunklen = 0;
 
-    stream.on('readable', () => {
-        let chunk;
+    stream.on('readable', function () {
+        var chunk;
 
         while ((chunk = stream.read()) !== null) {
             chunks.push(chunk);
@@ -553,6 +554,14 @@ function resolveStream(stream, callback) {
         }
     });
 
-    stream.on('error', err => callback(err));
-    stream.on('end', () => callback(null, Buffer.concat(chunks, chunklen)));
+    stream.on('error', function (err) {
+        return callback(err);
+    });
+    stream.on('end', function () {
+        return callback(null, Buffer.concat(chunks, chunklen));
+    });
+}
+
+function repeat(str, count) {
+    return new Array(count + 1).join(str);
 }

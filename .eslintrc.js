@@ -18,10 +18,10 @@ module.exports = {
             allowShortCircuit: true
         }],
         'no-unused-vars': 2,
-        'no-undefined': 2,
+        'no-undef': 2,
         'handle-callback-err': 2,
         'no-new': 2,
-        'new-cap': 0,
+        'new-cap': 2,
         'no-eval': 2,
         'no-invalid-this': 2,
         radix: [2, 'always'],
@@ -39,32 +39,18 @@ module.exports = {
         'block-scoped-var': 2,
         'no-sequences': 2,
         'no-throw-literal': 2,
-        'no-useless-call': 2,
-        'no-useless-concat': 0,
+        'no-useless-concat': 2,
         'no-void': 2,
         yoda: 2,
-        'no-undef': 2,
-        'global-require': 2,
-        'no-var': 2,
         'no-bitwise': 2,
         'no-lonely-if': 2,
         'no-mixed-spaces-and-tabs': 2,
-        'arrow-body-style': [2, 'as-needed'],
-        'arrow-parens': [2, 'as-needed'],
-        'prefer-arrow-callback': 2,
-        'object-shorthand': 2,
-        'prefer-spread': 2
+        'no-console': 0
     },
     env: {
-        es6: true,
+        es6: false,
         node: true
     },
     extends: 'eslint:recommended',
-    globals: {
-        it: true,
-        describe: true,
-        beforeEach: true,
-        afterEach: true
-    },
     fix: true
 };

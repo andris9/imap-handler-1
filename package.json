@@ -1,7 +1,7 @@
 {
   "name": "imap-handler-1",
   "main": "lib/imap-handler.js",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "homepage": "https://github.com/andris9/imap-handler-1",
   "author": "Andris Reinman <andris@kreata.ee>",
   "description": "Parse and compile IMAP commands",
@@ -19,10 +19,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "chai": "~3.4.1",
+    "chai": "~3.5.0",
     "grunt": "~0.4.5",
     "grunt-eslint": "^17.3.1",
     "grunt-mocha-test": "~0.12.7",
-    "mocha": "~2.3.4"
+    "mocha": "~2.4.5"
   }
 }

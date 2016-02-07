@@ -1,6 +1,6 @@
 # IMAP Handler
 
-Server specific fork of [emailjs-imap-handler](https://github.com/emailjs/emailjs-imap-handler) for Node.js (v5+). Mostly differs from the upstream in the behavior for compiling – instead of compiling a command into long string, a Stream object is returned that can be piped directly to socket. Goal is to pass around large messages as streams instead of keeping these in memory.
+Server specific fork of [emailjs-imap-handler](https://github.com/emailjs/emailjs-imap-handler). Mostly differs from the upstream in the behavior for compiling – instead of compiling a command into long string, a Stream object is returned that can be piped directly to socket. Goal is to pass around large messages as streams instead of keeping these in memory.
 
 This is more suitable for servers than clients as it is currently not possible to pause the output stream to wait for '+' tagged server response for literal values.
 
@@ -54,7 +54,7 @@ If section or partial values are not specified in the command, the values are al
 For example
 
 ```javascript
-let imapHandler = require("imap-handler-1");
+var imapHandler = require("imap-handler-1");
 
 imapHandler.parser("A1 FETCH *:4 (BODY[HEADER.FIELDS ({4}\r\nDate Subject)]<12.45> UID)");
 ```
@@ -136,7 +136,7 @@ The input object differs from the parsed object with the following aspects:
 For example
 
 ```javascript
-let command = {
+var command = {
     tag: "*",
     command: "OK",
     attributes: [
